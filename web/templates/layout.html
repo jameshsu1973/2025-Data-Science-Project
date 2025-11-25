@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Santander Product Recommendation Form</title>
+        <!-- Load Tailwind CSS -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            /* Custom styles for the Inter font and overall body look */
+            body {
+                font-family: 'Inter', sans-serif;
+                background-color: #f4f6f8; /* Light gray background */
+            }
+        </style>
+    </head>
+    <body class="min-h-screen flex flex-col">
+        <!-- Banner -->
+        <header class="bg-red-600 text-white shadow-lg p-6">
+            <h1 class="text-3xl font-extrabold text-center tracking-tight">
+                Santander Bank Product Recommendation
+            </h1>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-grow flex items-center justify-center p-4">
+            <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl p-6 md:p-10">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        <footer class="text-center p-4 text-gray-500 text-sm">
+            &copy; 2025 Santander Product Recommendation Data Collector
+        </footer>
+    </body>
+</html>

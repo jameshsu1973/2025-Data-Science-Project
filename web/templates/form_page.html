@@ -1,0 +1,113 @@
+{% extends "layout.html" %}{% block content %}<!-- Progress Indicator (1/x, 2/x, ...) -->
+<div class="text-center mb-6">
+    <span class="text-lg font-semibold text-red-600">
+        Step {{ current_step }} of {{ total_steps }}
+    </span>
+    <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+        <!-- Calculate width based on progress -->
+        {% set progress_width = (current_step / total_steps) * 100 %}
+        <div class="bg-red-600 h-2.5 rounded-full transition-all duration-500 ease-out" style="width: {{ progress_width }}%"></div>
+    </div>
+</div>
+
+<h2 class="text-2xl font-bold mb-8 text-gray-800">{{ field.label }}</h2>
+<p class="text-sm text-gray-500 mb-6 border-l-4 border-red-300 pl-3 italic">{{ field.help }}</p>
+
+<!-- Form for the current step -->
+<!-- The action needs to point to the current page to handle POST for the previous field -->
+<form method="POST" action="{{ url_for('form_step', step=current_step) }}" class="space-y-6" id="multi-step-form">
+    
+    <!-- Hidden input for the field ID to ensure correct data saving on the next step -->
+    <input type="hidden" name="field_id" value="{{ field.id }}">
+
+    {% if field.type == 'text' or field.type == 'date' or field.type == 'number' %}
+        
+        <label for="{{ field.id }}" class="block text-sm font-medium text-gray-700">
+            Enter Value:
+            {% if field.required %}<span class="text-red-500">*</span>{% endif %}
+        </label>
+        <input 
+            type="{{ field.type }}" 
+            id="{{ field.id }}" 
+            name="{{ field.id }}" 
+            value="{{ saved_value or '' }}" 
+            {% if field.required %}required{% endif %}
+            {% if field.min is defined %}min="{{ field.min }}"{% endif %}
+            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500"
+        >
+
+    {% elif field.type == 'select' %}
+        
+        <label for="{{ field.id }}" class="block text-sm font-medium text-gray-700">
+            Select Option:
+            {% if field.required %}<span class="text-red-500">*</span>{% endif %}
+        </label>
+        <select 
+            id="{{ field.id }}" 
+            name="{{ field.id }}" 
+            {% if field.required %}required{% endif %}
+            class="mt-1 block w-full px-4 py-2 border border-gray-300 bg-white rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500"
+        >
+            <option value="" disabled selected>-- Choose an option --</option>
+            {% for option in field.options %}
+                <option value="{{ option.value }}" {% if saved_value == option.value %}selected{% endif %}>
+                    {{ option.text }}
+                </option>
+            {% endfor %}
+        </select>
+
+    {% elif field.type == 'radio' %}
+        
+        <div class="space-y-4">
+            {% for option in field.options %}
+                <div class="flex items-center">
+                    <input 
+                        id="{{ field.id }}_{{ loop.index }}" 
+                        name="{{ field.id }}" 
+                        type="radio" 
+                        value="{{ option.value }}"
+                        {% if saved_value == option.value %}checked{% endif %}
+                        {% if field.required %}required{% endif %}
+                        class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"
+                    >
+                    <label for="{{ field.id }}_{{ loop.index }}" class="ml-3 block text-sm font-medium text-gray-700 cursor-pointer">
+                        {{ option.text }}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+
+    {% endif %}
+
+    <!-- Navigation Buttons -->
+    <div class="flex justify-between pt-6 border-t border-gray-100 mt-8">
+        <!-- Previous Button -->
+        {% if current_step > 1 %}
+            <button 
+                type="submit" 
+                name="action" 
+                value="previous" 
+                formnovalidate
+                class="flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg shadow-sm text-gray-700 bg-white hover:bg-gray-50 transition duration-150"
+            >
+                Previous
+            </button>
+        {% else %}
+            <!-- Spacer for layout balance on the first step -->
+            <div></div> 
+        {% endif %}
+
+        <!-- Next / Submit Button -->
+        <button 
+            type="submit" 
+            name="action"
+            value="{{ 'submit' if is_last_step else 'next' }}" 
+            class="flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-lg shadow-md text-white {{ 'bg-red-700 hover:bg-red-800' if is_last_step else 'bg-red-600 hover:bg-red-700' }} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150"
+        >
+            {{ 'Finish & Submit' if is_last_step else 'Next' }}
+        </button>
+    </div>
+
+</form>
+
+{% endblock %}

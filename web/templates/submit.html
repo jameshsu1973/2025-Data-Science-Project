@@ -1,0 +1,18 @@
+{% extends "layout.html" %}{% block content %}<div class="text-center"><div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100"><!-- Simple Checkmark Icon (SVG) --><svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div><h2 class="mt-4 text-3xl font-extrabold text-gray-900">Form Submission Complete!</h2><p class="mt-2 text-lg text-gray-600">Thank you for providing the customer data. Here is the summary of the information collected:</p></div><!-- Data Summary Table -->
+<div class="mt-8 border border-gray-200 rounded-xl overflow-hidden">
+    <dl class="divide-y divide-gray-100">
+        {% for item in final_data %}
+        <div class="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 {{ 'bg-gray-50' if loop.index is divisibleby 2 else 'bg-white' }}">
+            <dt class="text-sm font-medium text-gray-500">{{ item.label }}</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 font-semibold">{{ item.value or 'N/A' }}</dd>
+        </div>
+        {% endfor %}
+    </dl>
+</div>
+
+<div class="mt-6 text-center">
+    <a href="{{ url_for('index') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150">
+        Start a New Form
+    </a>
+</div>
+{% endblock %}
