@@ -1,8 +1,54 @@
-{% extends "layout.html" %}{% block content %}<div class="text-center"><div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100"><!-- Simple Checkmark Icon (SVG) --><svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div><h2 class="mt-4 text-3xl font-extrabold text-gray-900">Form Submission Complete!</h2><p class="mt-2 text-lg text-gray-600">Thank you for providing the customer data. Here is the summary of the information collected:</p></div><!-- Data Summary Table -->
+{% extends "layout.html" %}{% block content %}<div class="text-center"><div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100"><!-- Simple Checkmark Icon (SVG) --><svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div><h2 class="mt-4 text-3xl font-extrabold text-gray-900">Form Submission Complete!</h2><p class="mt-2 text-lg text-gray-600">Thank you for providing the customer data. Here is the summary of the information collected:</p></div><!-- Product Recommendations Section -->
+{% if model_available %}
+<div class="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
+    <h3 class="text-2xl font-bold text-blue-900 mb-4 flex items-center">
+        <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        Recommended Products
+    </h3>
+    
+    {% if recommendations %}
+    <p class="text-sm text-blue-700 mb-4">Based on the customer profile, we recommend the following products:</p>
+    
+    <div class="space-y-3">
+        {% for rec in recommendations %}
+        <div class="bg-white rounded-lg p-4 shadow-sm border border-blue-100 hover:shadow-md transition duration-150">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 text-blue-800 font-bold text-sm mr-3">
+                        {{ loop.index }}
+                    </span>
+                    <span class="text-lg font-semibold text-gray-900">{{ rec.product_name }}</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-sm font-medium text-blue-600">{{ rec.probability }}</span>
+                    <div class="w-24 bg-gray-200 rounded-full h-2 mt-1">
+                        <div class="bg-blue-600 h-2 rounded-full" style="width: {{ (rec.probability_value * 100)|round(1) }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-sm text-red-600">Unable to generate recommendations at this time.</p>
+    {% endif %}
+</div>
+{% else %}
+<div class="mt-8 bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+    <p class="text-sm text-yellow-800">
+        <strong>Note:</strong> Prediction model is not yet available. Please train and save the model first.
+    </p>
+</div>
+{% endif %}
+
+<!-- Data Summary Table -->
 <div class="mt-8 border border-gray-200 rounded-xl overflow-hidden">
+    <h3 class="text-xl font-bold text-gray-900 px-6 py-4 bg-gray-50">Customer Information Summary</h3>
     <dl class="divide-y divide-gray-100">
         {% for item in final_data %}
-        <div class="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 {{ 'bg-gray-50' if loop.index is divisibleby 2 else 'bg-white' }}">
+        <div class="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 {{ 'bg-white' if loop.index is divisibleby 2 else 'bg-gray-50' }}">
             <dt class="text-sm font-medium text-gray-500">{{ item.label }}</dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 font-semibold">{{ item.value or 'N/A' }}</dd>
         </div>
