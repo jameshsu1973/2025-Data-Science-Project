@@ -1,4 +1,8 @@
 import pandas as pd
+import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
 # Load first 1000 rows
 df = pd.read_csv('dataset/train_ver2.csv', nrows=1000)
