@@ -6,18 +6,32 @@ This project builds a web application that recommends bank products to customers
 
 ## Project Structure
 ```
-project/
-├── dataset/              # Training and test data
-│   ├── train_ver2.csv
-│   └── test_ver2.csv
-├── models/              # Trained models will be saved here
+Final/
+├── Data Science Term-Project Rules.pdf
+├── README.MD
+├── dataset/
+│   ├── sample_submission.csv
+│   ├── test_ver2.csv
+│   └── train_ver2.csv
+├── group5_proposal.pdf
+├── models/
 │   ├── model.pkl
 │   └── preprocessor.pkl
-├── web/                 # Flask web application
-│   ├── app.py
-│   └── templates/
-├── train_model.py       # Model training script
-└── requirements.txt
+├── requirements.txt
+├── src/
+│   ├── preprocessor.py
+│   ├── train_model.py
+│   └── utils/
+│       └── const.py
+├── test/
+│   ├── check_data.py
+│   └── test_prediction.py
+└── web/
+	├── app.py
+	└── templates/
+		├── form_page.html
+		├── layout.html
+		└── submit.html
 ```
 
 ## Setup Instructions
