@@ -9,6 +9,7 @@ class SantanderPreprocessor:
         self.scaler = StandardScaler()
         self.categorical_cols = []
         self.numerical_cols = []
+        self.numerical_medians = {}  # 儲存每個數值欄位的中位數
         
     def fit(self, df):
         """Fit the preprocessor on training data"""
@@ -31,9 +32,11 @@ class SantanderPreprocessor:
         for col in self.categorical_cols:
             df_encoded[col] = self.label_encoders[col].transform(df[col])
         
-        # Fill missing values in numerical columns
+        # Fill missing values in numerical columns and save medians
         for col in self.numerical_cols:
-            df_encoded[col] = df_encoded[col].fillna(df_encoded[col].median())
+            median_val = df_encoded[col].median()
+            self.numerical_medians[col] = median_val  # 儲存中位數
+            df_encoded[col] = df_encoded[col].fillna(median_val)
         
         # Fit scaler
         self.scaler.fit(df_encoded)
@@ -52,11 +55,13 @@ class SantanderPreprocessor:
             df[col] = df[col].apply(lambda x: x if x in le.classes_ else 'Unknown')
             df[col] = le.transform(df[col])
         
-        # Handle numerical columns
+        # Handle numerical columns - 使用訓練時保存的中位數
         for col in self.numerical_cols:
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors='coerce')
-                df[col] = df[col].fillna(0)
+                # 使用訓練時計算的中位數，而非填 0
+                median_val = self.numerical_medians.get(col, 0)
+                df[col] = df[col].fillna(median_val)
         
         # Scale the data
         X_scaled = self.scaler.transform(df)

@@ -7,10 +7,12 @@ from preprocessor import SantanderPreprocessor
 from utils.const import FEATURE_COLS, TARGET_COLS
 
 import pandas as pd
+import numpy as np
 import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.multioutput import MultiOutputClassifier
+from sklearn.metrics import hamming_loss, f1_score, classification_report
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -70,9 +72,53 @@ def train_model(X, y):
     model = MultiOutputClassifier(base_model)
     model.fit(X_train, y_train)
     
-    # Evaluate
+    # Evaluate with multiple metrics
+    print("\n" + "=" * 60)
+    print("Model Evaluation")
+    print("=" * 60)
+    
+    y_pred = model.predict(X_test)
+    
+    # 1. Subset Accuracy (all 24 labels must be correct)
     score = model.score(X_test, y_test)
-    print(f"\nModel accuracy on test set: {score:.4f}")
+    print(f"\n1. Subset Accuracy: {score:.4f}")
+    print("   (Strict: all 24 products must be predicted correctly)")
+    
+    # 2. Hamming Loss (average error per label)
+    h_loss = hamming_loss(y_test, y_pred)
+    print(f"\n2. Hamming Loss: {h_loss:.4f}")
+    print(f"   (Average error rate per product: {h_loss*100:.2f}%)")
+    
+    # 3. F1 Score
+    f1_micro = f1_score(y_test, y_pred, average='micro', zero_division=0)
+    f1_macro = f1_score(y_test, y_pred, average='macro', zero_division=0)
+    print(f"\n3. F1 Score:")
+    print(f"   - Micro F1: {f1_micro:.4f} (weighted by sample count)")
+    print(f"   - Macro F1: {f1_macro:.4f} (average across all products)")
+    
+    # 4. Feature Importance
+    print("\n" + "=" * 60)
+    print("Feature Importance (Top 10)")
+    print("=" * 60)
+    
+    # Average feature importance across all 24 product classifiers
+    feature_importances = np.mean([
+        estimator.feature_importances_ 
+        for estimator in model.estimators_
+    ], axis=0)
+    
+    # Create DataFrame for display
+    importance_df = pd.DataFrame({
+        'Feature': FEATURE_COLS,
+        'Importance': feature_importances
+    }).sort_values('Importance', ascending=False)
+    
+    print("\n" + importance_df.head(10).to_string(index=False))
+    
+    # Save feature importance to CSV
+    importance_path = os.path.join(REPO_PATH, 'models', 'feature_importance.csv')
+    importance_df.to_csv(importance_path, index=False)
+    print(f"\nFull feature importance saved to: {importance_path}")
     
     return model, preprocessor
 
